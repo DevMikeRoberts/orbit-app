@@ -43,6 +43,7 @@ export function PreviewStep({ state }: { state: WizardState }) {
             view={view}
             locations={state.locations}
             liveLocation={liveCoords}
+            fill="container"
           />
         ) : (
           <div className="wizard-preview-empty">

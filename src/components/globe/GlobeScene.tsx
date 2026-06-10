@@ -113,13 +113,17 @@ export function GlobeScene({
   view,
   locations,
   liveLocation,
+  fill = "viewport",
 }: {
   view: View;
   locations: ProfileLocation[];
   liveLocation?: { lat: number; lng: number };
+  fill?: "viewport" | "container";
 }) {
+  const wrapperClass =
+    fill === "container" ? "absolute inset-0" : "fixed inset-0";
   return (
-    <div className="fixed inset-0">
+    <div className={wrapperClass}>
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [-0.32, 0.63, 2.6], fov: 35 }}
