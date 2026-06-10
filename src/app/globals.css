@@ -693,13 +693,15 @@ body {
    ================================================================ */
 
 .wizard-root {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   background: var(--background);
   display: flex;
   flex-direction: column;
   align-items: center;
   color: var(--foreground);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .wizard-shell {
