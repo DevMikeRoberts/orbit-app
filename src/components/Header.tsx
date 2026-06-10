@@ -3,7 +3,6 @@
 import type { View } from "@/app/page";
 
 const NAV_LINKS: { label: string; view?: View; href?: string }[] = [
-  { label: "Resume", href: "/michael_roberts_resume.pdf" },
   { label: "Projects", view: "projects" },
   { label: "Contact", view: "contact" },
 ];
@@ -11,7 +10,7 @@ const NAV_LINKS: { label: string; view?: View; href?: string }[] = [
 export function Header({
   view,
   onViewChange,
-  handle = "@devmikeroberts",
+  handle = "@yourhandle",
   resumeUrl,
 }: {
   view: View;

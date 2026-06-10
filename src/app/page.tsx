@@ -5,7 +5,7 @@ import { locations } from "@/data/locations";
 
 export type View = "home" | "contact" | "projects";
 
-const LIVE_LOCATION = { lat: 33.749, lng: -84.388 };
+const LIVE_LOCATION = { lat: 37.774, lng: -122.419 };
 const VIEW: View = "home";
 
 export default function Home() {

@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Orbit — Michael",
-  description: "Software engineer, builder, and lifelong learner.",
+  title: "Orbit — Your Life on a Globe",
+  description: "Build an interactive 3D portfolio that shows where you've been, what you've built, and who you are.",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👋</text></svg>",
   },

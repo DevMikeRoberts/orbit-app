@@ -40,12 +40,12 @@ export function LivePin({
             <div className="live-ping-ring live-ping-ring--delay" />
             <div
               className="live-avatar"
-              style={{ backgroundImage: "url(/me.png)" }}
+              style={{ backgroundImage: "url(/placeholder.jpg)" }}
             />
           </div>
           <div className="live-text-bubble">
             <span className="live-subtitle">currently in</span>
-            <span className="live-city">&nbsp;Atlanta, Georgia</span>
+            <span className="live-city">&nbsp;San Francisco, CA</span>
           </div>
         </div>
       </Html>
