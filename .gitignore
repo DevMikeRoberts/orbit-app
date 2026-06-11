@@ -48,6 +48,3 @@ vercel-overview.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# user profiles (generated at runtime)
-/profiles/*.json

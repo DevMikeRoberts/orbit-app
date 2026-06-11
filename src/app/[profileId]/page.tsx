@@ -9,7 +9,7 @@ export async function generateMetadata({
   params: Promise<{ profileId: string }>;
 }): Promise<Metadata> {
   const { profileId } = await params;
-  const profile = getProfile(profileId);
+  const profile = await getProfile(profileId);
   if (!profile) return {};
   return {
     title: `Orbit — ${profile.name}`,
@@ -25,7 +25,7 @@ export default async function Page({
   params: Promise<{ profileId: string }>;
 }) {
   const { profileId } = await params;
-  const profile = getProfile(profileId);
+  const profile = await getProfile(profileId);
   if (!profile) notFound();
   return <ProfilePage profile={profile} />;
 }

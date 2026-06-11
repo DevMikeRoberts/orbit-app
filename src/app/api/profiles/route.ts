@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   }
 
   let id = generateProfileId(body.name);
-  while (getProfile(id)) {
+  while (await getProfile(id)) {
     id = generateProfileId(body.name);
   }
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     createdAt: new Date().toISOString(),
   };
 
-  saveProfile(profile);
+  await saveProfile(profile);
 
   return Response.json({ id, url: `/${id}` }, { status: 201 });
 }

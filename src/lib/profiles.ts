@@ -1,35 +1,24 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { sql } from '@vercel/postgres';
 import type { UserProfile } from '@/types/profile';
 
-const PROFILES_DIR = join(process.cwd(), 'profiles');
-
-function ensureDir() {
-  if (!existsSync(PROFILES_DIR)) {
-    mkdirSync(PROFILES_DIR, { recursive: true });
-  }
-}
-
-export function getProfile(id: string): UserProfile | null {
-  ensureDir();
-  const file = join(PROFILES_DIR, `${id}.json`);
-  if (!existsSync(file)) return null;
+export async function getProfile(id: string): Promise<UserProfile | null> {
   try {
-    return JSON.parse(readFileSync(file, 'utf8')) as UserProfile;
+    const { rows } = await sql`SELECT data FROM profiles WHERE id = ${id}`;
+    return rows.length > 0 ? (rows[0].data as UserProfile) : null;
   } catch {
     return null;
   }
 }
 
-export function saveProfile(profile: UserProfile): void {
-  ensureDir();
-  const file = join(PROFILES_DIR, `${profile.id}.json`);
-  writeFileSync(file, JSON.stringify(profile, null, 2), 'utf8');
+export async function saveProfile(profile: UserProfile): Promise<void> {
+  await sql`
+    INSERT INTO profiles (id, data)
+    VALUES (${profile.id}, ${JSON.stringify(profile)})
+    ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data
+  `;
 }
 
-export function listProfileIds(): string[] {
-  ensureDir();
-  return readdirSync(PROFILES_DIR)
-    .filter((f) => f.endsWith('.json'))
-    .map((f) => f.replace(/\.json$/, ''));
+export async function listProfileIds(): Promise<string[]> {
+  const { rows } = await sql`SELECT id FROM profiles ORDER BY created_at DESC`;
+  return rows.map((r) => r.id as string);
 }
