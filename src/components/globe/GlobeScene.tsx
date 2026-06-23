@@ -17,6 +17,15 @@ import { useKonami } from "@/context/KonamiContext";
 import type { View } from "@/components/ProfilePage";
 import type { ProfileLocation } from "@/types/profile";
 
+export type LiveLocationInfo = {
+  lat: number;
+  lng: number;
+  city?: string;
+  region?: string;
+  country?: string;
+  avatarUrl?: string;
+};
+
 function SceneContent({
   view,
   locations,
@@ -24,7 +33,7 @@ function SceneContent({
 }: {
   view: View;
   locations: ProfileLocation[];
-  liveLocation?: { lat: number; lng: number };
+  liveLocation?: LiveLocationInfo;
 }) {
   const globeGroupRef = useRef<THREE.Group>(null);
   const spinProgress = useRef(0);
@@ -101,7 +110,14 @@ function SceneContent({
             />
           ))}
           {liveLocation && (
-            <LivePin lat={liveLocation.lat} lng={liveLocation.lng} />
+            <LivePin
+              lat={liveLocation.lat}
+              lng={liveLocation.lng}
+              city={liveLocation.city}
+              region={liveLocation.region}
+              country={liveLocation.country}
+              avatarUrl={liveLocation.avatarUrl}
+            />
           )}
         </FadeIn>
       </group>
@@ -117,7 +133,7 @@ export function GlobeScene({
 }: {
   view: View;
   locations: ProfileLocation[];
-  liveLocation?: { lat: number; lng: number };
+  liveLocation?: LiveLocationInfo;
   fill?: "viewport" | "container";
 }) {
   const wrapperClass =

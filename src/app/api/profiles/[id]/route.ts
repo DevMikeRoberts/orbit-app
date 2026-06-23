@@ -6,6 +6,7 @@ import {
   saveProfile,
   deleteProfile,
 } from "@/lib/profiles";
+import { hasKey, sanitizeProfilePatch } from "@/lib/validateProfile";
 import type { UserProfile } from "@/types/profile";
 
 async function authorize(id: string) {
@@ -31,9 +32,9 @@ export async function PUT(
   const guard = await authorize(id);
   if ("error" in guard) return guard.error;
 
-  let body: Partial<UserProfile>;
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
@@ -41,13 +42,17 @@ export async function PUT(
   const existing = await getProfile(id);
   if (!existing) return Response.json({ error: "Not found" }, { status: 404 });
 
+  const body = sanitizeProfilePatch(raw);
+
   const updated: UserProfile = {
     ...existing,
-    name: body.name ?? existing.name,
-    handle: body.handle ?? existing.handle,
-    email: body.email ?? existing.email,
-    title: body.title ?? existing.title,
-    resumeUrl: body.resumeUrl ?? existing.resumeUrl,
+    name: body.name && body.name.trim() ? body.name : existing.name,
+    handle:
+      body.handle && body.handle.trim() ? body.handle : existing.handle,
+    email: existing.email,
+    title: hasKey(raw, "title") ? body.title : existing.title,
+    image: hasKey(raw, "image") ? body.image : existing.image,
+    resumeUrl: hasKey(raw, "resumeUrl") ? body.resumeUrl : existing.resumeUrl,
     liveLocation: body.liveLocation ?? existing.liveLocation,
     locations: body.locations ?? existing.locations,
     projects: body.projects ?? existing.projects,

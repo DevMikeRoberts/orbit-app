@@ -17,6 +17,7 @@ export default async function CreatePage() {
     <ChatCreate
       initialName={session.user.name ?? ""}
       email={session.user.email ?? ""}
+      initialImage={session.user.image ?? undefined}
     />
   );
 }

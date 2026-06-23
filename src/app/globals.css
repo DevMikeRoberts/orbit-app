@@ -559,6 +559,165 @@ body {
   }
 }
 
+/* ---------- Project +card (owner-only) ---------- */
+.project-card--add {
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px dashed rgba(0, 0, 0, 0.18);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 2rem 1.5rem;
+  font: inherit;
+  color: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  text-align: center;
+  min-height: 160px;
+}
+
+.project-card--add:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.32);
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.project-add-plus {
+  font-size: 2.4rem;
+  line-height: 1;
+  font-weight: 200;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.project-card--add:hover .project-add-plus {
+  color: var(--accent, #60a5fa);
+}
+
+.project-add-label {
+  font-size: 0.88rem;
+  letter-spacing: 0.02em;
+}
+
+.project-card--form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.25rem 1.4rem;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  min-height: 160px;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.05),
+    0 24px 48px -12px rgba(0, 0, 0, 0.15);
+}
+
+.project-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-form-eyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent, #60a5fa);
+  font-weight: 600;
+}
+
+.project-form-close {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+}
+
+.project-form-close:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.project-form-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: rgba(0, 0, 0, 0.95);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.project-form-input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.project-form-input:focus {
+  border-color: var(--accent, #60a5fa);
+  background: #fff;
+}
+
+.project-form-textarea {
+  resize: vertical;
+  min-height: 2.4rem;
+}
+
+.project-form-accents {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.project-form-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.project-form-swatch.is-active {
+  border-color: rgba(0, 0, 0, 0.6);
+  transform: scale(1.15);
+}
+
+.project-form-error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #dc2626;
+}
+
+.project-form-save {
+  margin-top: 0.2rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--accent, #60a5fa);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.project-form-save:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.project-form-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---------- Contact: just the email, centered, huge ---------- */
 
 .contact-mega {
@@ -1061,10 +1220,201 @@ body {
   color: #f87171;
 }
 
+/* ---------- Work details step ---------- */
+.chat-work-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.chat-work-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.chat-work-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chat-send--wide {
+  width: auto;
+  padding: 0 1rem;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.chat-send--ghost {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.chat-send--ghost:hover:not(:disabled) {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.85);
+}
+
+/* ---------- Extras step (multi-add places) ---------- */
+.chat-extras {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.chat-extra-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.chat-extra-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.chat-extra-emoji {
+  font-size: 1.05rem;
+}
+
+.chat-extra-text {
+  flex: 1;
+  color: rgba(255,255,255,0.95);
+}
+
+.chat-extra-type {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+}
+
+.chat-extra-remove {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.chat-extra-remove:hover {
+  color: #f87171;
+}
+
+.chat-extra-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chat-extra-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.chat-extra-chip:hover {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.9);
+}
+
+.chat-extra-chip.is-active {
+  background: rgba(96,165,250,0.18);
+  border-color: rgba(96,165,250,0.5);
+  color: #fff;
+}
+
+.chat-extra-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- Projects step ---------- */
+.chat-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.chat-project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.chat-project-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid var(--accent, rgba(96,165,250,0.6));
+  border-radius: 10px;
+}
+
+.chat-project-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.chat-project-title {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.95);
+}
+
+.chat-project-blurb {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.chat-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.chat-project-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 @media (max-width: 640px) {
   .chat-bubble { max-width: 90vw; font-size: 0.92rem; }
   .chat-input-row { flex-wrap: wrap; }
   .chat-skip { flex: 1; }
+  .chat-work-row { grid-template-columns: 1fr; }
 }
 
 /* ---------- Landing topbar + AuthNav ---------- */
@@ -1330,6 +1680,42 @@ body {
 }
 
 /* ---------- Edit profile ---------- */
+.edit-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+}
+
+.edit-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.edit-avatar-fallback {
+  font-size: 1.8rem;
+  font-weight: 200;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+}
+
+.edit-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 .edit-fields {
   display: flex;
   flex-direction: column;
@@ -1432,8 +1818,38 @@ body {
 
 .edit-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.75rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.edit-cancel {
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.88rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.edit-cancel:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border-color: rgba(255,255,255,0.22);
+}
+
+.edit-cancel.is-dirty {
+  color: #fca5a5;
+  border-color: rgba(248,113,113,0.35);
+}
+
+.edit-cancel.is-dirty:hover {
+  background: rgba(248,113,113,0.08);
+  border-color: rgba(248,113,113,0.6);
+  color: #fecaca;
 }

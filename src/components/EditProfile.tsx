@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CityPicker } from "@/components/create/CityPicker";
 import {
@@ -22,11 +22,24 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
   const [name, setName] = useState(profile.name);
   const [handle, setHandle] = useState(profile.handle);
   const [title, setTitle] = useState(profile.title ?? "");
+  const [image, setImage] = useState(profile.image ?? "");
   const [locations, setLocations] = useState<ProfileLocation[]>(profile.locations);
   const [adding, setAdding] = useState(false);
   const [pendingType, setPendingType] = useState<ConnectionType>("other");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const isDirty = useMemo(() => {
+    if (name !== profile.name) return true;
+    if (handle !== profile.handle) return true;
+    if (title !== (profile.title ?? "")) return true;
+    if (image !== (profile.image ?? "")) return true;
+    if (locations.length !== profile.locations.length) return true;
+    if (JSON.stringify(locations) !== JSON.stringify(profile.locations)) return true;
+    return false;
+  }, [name, handle, title, image, locations, profile]);
 
   const removeLocation = (id: string) => {
     setLocations((ls) => ls.filter((l) => l.id !== id));
@@ -59,6 +72,30 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
     setAdding(false);
   };
 
+  const onPickFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`/api/profiles/${profile.id}/avatar`, {
+        method: "POST",
+        body: form,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setError(body?.error ?? "Couldn't upload photo.");
+        return;
+      }
+      const { url } = await res.json();
+      setImage(url);
+    } catch {
+      setError("Couldn't reach the server.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const save = async () => {
     setSaving(true);
     setError(null);
@@ -70,6 +107,7 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
           name: name.trim(),
           handle: handle.trim(),
           title: title.trim(),
+          image,
           locations,
         }),
       });
@@ -84,6 +122,14 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const cancel = () => {
+    if (isDirty) {
+      const ok = window.confirm("Discard your changes?");
+      if (!ok) return;
+    }
+    router.push("/dashboard");
   };
 
   return (
@@ -102,6 +148,51 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
           <h1 className="dash-title">
             Edit globe<span className="accent-period">.</span>
           </h1>
+        </div>
+
+        <div className="edit-avatar-row">
+          <div
+            className="edit-avatar"
+            style={
+              image
+                ? { backgroundImage: `url(${image})` }
+                : { backgroundColor: "rgba(255,255,255,0.06)" }
+            }
+            aria-label="Profile photo"
+          >
+            {!image && <span className="edit-avatar-fallback">{name.charAt(0) || "?"}</span>}
+          </div>
+          <div className="edit-avatar-actions">
+            <button
+              type="button"
+              className="dash-action"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? "Uploading…" : image ? "Change photo" : "Upload photo"}
+            </button>
+            {image && (
+              <button
+                type="button"
+                className="dash-action dash-action--ghost"
+                onClick={() => setImage("")}
+                disabled={uploading}
+              >
+                Remove
+              </button>
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void onPickFile(f);
+                e.target.value = "";
+              }}
+            />
+          </div>
         </div>
 
         <div className="edit-fields">
@@ -201,9 +292,13 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
         {error && <p className="chat-error">{error}</p>}
 
         <div className="edit-footer">
-          <a href="/dashboard" className="dash-action dash-action--ghost">
-            Cancel
-          </a>
+          <button
+            type="button"
+            className={`edit-cancel ${isDirty ? "is-dirty" : ""}`}
+            onClick={cancel}
+          >
+            {isDirty ? "Discard changes" : "Back to dashboard"}
+          </button>
           <button
             className="chat-launch"
             onClick={save}
