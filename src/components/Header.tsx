@@ -1,6 +1,6 @@
 "use client";
 
-import type { View } from "@/app/page";
+import type { View } from "@/components/ProfilePage";
 
 const NAV_LINKS: { label: string; view?: View; href?: string }[] = [
   { label: "Projects", view: "projects" },
@@ -12,11 +12,13 @@ export function Header({
   onViewChange,
   handle = "@yourhandle",
   resumeUrl,
+  editHref,
 }: {
   view: View;
   onViewChange: (v: View) => void;
   handle?: string;
   resumeUrl?: string;
+  editHref?: string;
 }) {
   const links = resumeUrl
     ? [{ label: "Resume", href: resumeUrl }, ...NAV_LINKS.slice(1)]
@@ -24,12 +26,22 @@ export function Header({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-3">
-      <button
-        onClick={() => onViewChange("home")}
-        className="text-sm font-semibold tracking-tight text-white/60 transition-colors hover:text-white"
-      >
-        {handle}
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onViewChange("home")}
+          className="text-sm font-semibold tracking-tight text-white/60 transition-colors hover:text-white"
+        >
+          {handle}
+        </button>
+        {editHref && (
+          <a
+            href={editHref}
+            className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white/70 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            Edit
+          </a>
+        )}
+      </div>
       <nav className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 backdrop-blur-xl border border-white/[0.06]">
         {links.map((link) =>
           link.href ? (
