@@ -14,7 +14,7 @@ import { HaloRing } from "./HaloRing";
 import { LivePin } from "./LivePin";
 import { FadeIn } from "./FadeIn";
 import { useKonami } from "@/context/KonamiContext";
-import type { View } from "@/app/page";
+import type { View } from "@/components/ProfilePage";
 import type { ProfileLocation } from "@/types/profile";
 
 function SceneContent({

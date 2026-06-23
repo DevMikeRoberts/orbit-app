@@ -9,7 +9,13 @@ import type { UserProfile } from "@/types/profile";
 
 export type View = "home" | "contact" | "projects";
 
-export default function ProfilePage({ profile }: { profile: UserProfile }) {
+export default function ProfilePage({
+  profile,
+  isOwner = false,
+}: {
+  profile: UserProfile;
+  isOwner?: boolean;
+}) {
   const [view, setView] = useState<View>("home");
 
   const liveLocation =
@@ -35,6 +41,7 @@ export default function ProfilePage({ profile }: { profile: UserProfile }) {
         onViewChange={setView}
         handle={profile.handle}
         resumeUrl={profile.resumeUrl}
+        editHref={isOwner ? `/dashboard/${profile.id}/edit` : undefined}
       />
       <ContactOverlay view={view} onViewChange={setView} email={profile.email} />
       <ProjectsOverlay view={view} onViewChange={setView} projects={profile.projects} />

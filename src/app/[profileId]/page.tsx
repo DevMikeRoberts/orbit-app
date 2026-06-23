@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { getProfile } from "@/lib/profiles";
+import { auth } from "@/auth";
+import { getProfile, getProfileOwner } from "@/lib/profiles";
 import ProfilePage from "@/components/ProfilePage";
 import type { Metadata } from "next";
 
@@ -25,7 +26,12 @@ export default async function Page({
   params: Promise<{ profileId: string }>;
 }) {
   const { profileId } = await params;
-  const profile = await getProfile(profileId);
+  const [profile, owner, session] = await Promise.all([
+    getProfile(profileId),
+    getProfileOwner(profileId),
+    auth(),
+  ]);
   if (!profile) notFound();
-  return <ProfilePage profile={profile} />;
+  const isOwner = !!session?.user?.id && session.user.id === owner;
+  return <ProfilePage profile={profile} isOwner={isOwner} />;
 }

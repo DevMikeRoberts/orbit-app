@@ -1,6 +1,6 @@
 "use client";
 
-import type { View } from "@/app/page";
+import type { View } from "@/components/ProfilePage";
 
 export function ContactOverlay({
   view,

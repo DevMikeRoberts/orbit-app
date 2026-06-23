@@ -1,9 +1,15 @@
 import { NextRequest } from "next/server";
+import { auth } from "@/auth";
 import { saveProfile, getProfile } from "@/lib/profiles";
 import { generateProfileId } from "@/lib/hash";
 import type { UserProfile } from "@/types/profile";
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return Response.json({ error: "Sign in required" }, { status: 401 });
+  }
+
   let body: Partial<UserProfile>;
   try {
     body = await req.json();
@@ -36,7 +42,7 @@ export async function POST(req: NextRequest) {
     createdAt: new Date().toISOString(),
   };
 
-  await saveProfile(profile);
+  await saveProfile(profile, session.user.id);
 
   return Response.json({ id, url: `/${id}` }, { status: 201 });
 }

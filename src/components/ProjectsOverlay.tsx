@@ -1,6 +1,6 @@
 "use client";
 
-import type { View } from "@/app/page";
+import type { View } from "@/components/ProfilePage";
 import type { ProfileProject } from "@/types/profile";
 
 export function ProjectsOverlay({

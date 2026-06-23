@@ -45,6 +45,11 @@ screenshot-*.png
 # dev artifacts
 vercel-overview.txt
 
+# claude code / agent local config
+.claude/
+.agents/
+skills-lock.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
