@@ -100,7 +100,7 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
       <section className="dash-body">
         <div className="dash-intro">
           <h1 className="dash-title">
-            Edit globe<span className="wizard-period">.</span>
+            Edit globe<span className="accent-period">.</span>
           </h1>
         </div>
 
