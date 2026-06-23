@@ -29,6 +29,7 @@ export interface ChatAnswers {
   email: string;
   title?: string;
   handle?: string;
+  image?: string;
   birthDate?: string;
   born?: ResolvedCity;
   raised?: ResolvedCity;
@@ -36,6 +37,7 @@ export interface ChatAnswers {
   school?: { city: ResolvedCity; name?: string };
   work?: { city: ResolvedCity; company?: string; role?: string };
   extras?: ExtraPlace[];
+  projects?: import("@/types/profile").ProfileProject[];
 }
 
 function slugifyHandle(name: string): string {
@@ -56,7 +58,7 @@ function birthYear(birthDate?: string): string {
 
 function placeLabel(city: ResolvedCity): string {
   const tail = [city.region, city.country].filter(Boolean).join(", ");
-  return tail ? `📍 ${city.city}, ${tail}` : `📍 ${city.city}`;
+  return tail ? `${city.city}, ${tail}` : city.city;
 }
 
 function cityKey(city: ResolvedCity): string {
@@ -185,9 +187,10 @@ export function inferProfile(
     handle: answers.handle?.trim() || slugifyHandle(answers.name),
     email: answers.email,
     title: answers.title,
+    image: answers.image,
     liveLocation: { lat: answers.live.lat, lng: answers.live.lng },
     locations,
-    projects: [],
+    projects: answers.projects ?? [],
   };
 }
 

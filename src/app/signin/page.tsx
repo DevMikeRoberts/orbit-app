@@ -19,7 +19,7 @@ export default async function SignInPage({
       <div className="signin-card">
         <p className="landing-eyebrow">Orbit</p>
         <h1 className="signin-title">
-          Sign in<span className="wizard-period">.</span>
+          Sign in<span className="accent-period">.</span>
         </h1>
         <p className="signin-sub">
           Create a globe, save it, edit it whenever — your account ties it all

@@ -1,18 +1,97 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { View } from "@/components/ProfilePage";
 import type { ProfileProject } from "@/types/profile";
+import { PIN_COLORS } from "@/types/profile";
+import { classifyProjectUrl } from "@/lib/projectUrl";
 
 export function ProjectsOverlay({
   view,
   onViewChange,
   projects,
+  isOwner = false,
+  profileId,
 }: {
   view: View;
   onViewChange: (v: View) => void;
   projects: ProfileProject[];
+  isOwner?: boolean;
+  profileId?: string;
 }) {
   const open = view === "projects";
+  const router = useRouter();
+  const [adding, setAdding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [blurb, setBlurb] = useState("");
+  const [url, setUrl] = useState("");
+  const [tags, setTags] = useState("");
+  const [accent, setAccent] = useState<string>(PIN_COLORS[projects.length % PIN_COLORS.length]);
+  const [localProjects, setLocalProjects] = useState<ProfileProject[]>(projects);
+
+  useEffect(() => {
+    setLocalProjects(projects);
+  }, [projects]);
+
+  const renderProjects = saving ? localProjects : projects;
+
+  const reset = () => {
+    setTitle("");
+    setBlurb("");
+    setUrl("");
+    setTags("");
+    setAccent(PIN_COLORS[renderProjects.length % PIN_COLORS.length]);
+    setError(null);
+  };
+
+  const saveProject = async () => {
+    if (!profileId) return;
+    const t = title.trim();
+    if (!t) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const raw = url.trim();
+      const { github, url: link } = classifyProjectUrl(raw);
+      if (raw && !github && !link) {
+        setError("Use a full http:// or https:// URL");
+        return;
+      }
+      const next: ProfileProject = {
+        title: t,
+        blurb: blurb.trim(),
+        github,
+        url: link,
+        tags: tags
+          .split(",")
+          .map((x) => x.trim())
+          .filter(Boolean),
+        accent,
+      };
+      const nextProjects = [...localProjects, next];
+      const res = await fetch(`/api/profiles/${profileId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projects: nextProjects }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setError(body?.error ?? "Couldn't save project.");
+        return;
+      }
+      setLocalProjects(nextProjects);
+      setAdding(false);
+      reset();
+      router.refresh();
+    } catch {
+      setError("Couldn't reach the server.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -45,7 +124,7 @@ export function ProjectsOverlay({
         </div>
 
         <div className="projects-grid">
-          {projects.map((p, i) => {
+          {renderProjects.map((p, i) => {
             const style = {
               "--accent": p.accent,
               "--tilt": "0deg",
@@ -131,6 +210,87 @@ export function ProjectsOverlay({
               </div>
             );
           })}
+
+          {isOwner && !adding && (
+            <button
+              type="button"
+              className="project-card project-card--add"
+              onClick={() => setAdding(true)}
+              style={{ animationDelay: `${0.15 + renderProjects.length * 0.07}s` } as React.CSSProperties}
+            >
+              <div className="project-add-plus">+</div>
+              <div className="project-add-label">Add a project</div>
+            </button>
+          )}
+
+          {isOwner && adding && (
+            <div
+              className="project-card project-card--form"
+              style={{ "--accent": accent } as React.CSSProperties}
+            >
+              <div className="project-form-head">
+                <span className="project-form-eyebrow">New project</span>
+                <button
+                  type="button"
+                  className="project-form-close"
+                  aria-label="Cancel"
+                  onClick={() => {
+                    setAdding(false);
+                    reset();
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              <input
+                autoFocus
+                className="project-form-input"
+                placeholder="Project title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+              <textarea
+                className="project-form-input project-form-textarea"
+                placeholder="One-line description"
+                value={blurb}
+                onChange={(e) => setBlurb(e.target.value)}
+                rows={2}
+              />
+              <input
+                className="project-form-input"
+                placeholder="URL or GitHub link (optional)"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <input
+                className="project-form-input"
+                placeholder="Tags, comma-separated (optional)"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+              />
+              <div className="project-form-accents">
+                {PIN_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`project-form-swatch ${accent === c ? "is-active" : ""}`}
+                    style={{ background: c }}
+                    onClick={() => setAccent(c)}
+                    aria-label={`Accent ${c}`}
+                  />
+                ))}
+              </div>
+              {error && <p className="project-form-error">{error}</p>}
+              <button
+                type="button"
+                className="project-form-save"
+                onClick={saveProject}
+                disabled={saving || !title.trim()}
+              >
+                {saving ? "Saving…" : "Save project"}
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </div>

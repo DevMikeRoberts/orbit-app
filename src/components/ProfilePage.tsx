@@ -18,16 +18,36 @@ export default function ProfilePage({
 }) {
   const [view, setView] = useState<View>("home");
 
-  const liveLocation =
-    profile.liveLocation ??
-    (profile.locations.find((l) => l.connectionType === "live")
-      ? {
-          lat: profile.locations.find((l) => l.connectionType === "live")!.lat,
-          lng: profile.locations.find((l) => l.connectionType === "live")!.lng,
-        }
-      : profile.locations[0]
-        ? { lat: profile.locations[0].lat, lng: profile.locations[0].lng }
-        : undefined);
+  const liveEntry = profile.locations.find((l) => l.connectionType === "live");
+  const ll = profile.liveLocation;
+
+  const matchesLl = (l: { lat: number; lng: number }) =>
+    !!ll &&
+    Math.abs(l.lat - ll.lat) < 0.01 &&
+    Math.abs(l.lng - ll.lng) < 0.01;
+
+  let liveLocation:
+    | { lat: number; lng: number; city?: string; avatarUrl?: string }
+    | undefined;
+
+  if (ll) {
+    const matching = liveEntry && matchesLl(liveEntry)
+      ? liveEntry
+      : profile.locations.find(matchesLl);
+    liveLocation = {
+      lat: ll.lat,
+      lng: ll.lng,
+      city: matching?.city,
+      avatarUrl: profile.image,
+    };
+  } else if (liveEntry) {
+    liveLocation = {
+      lat: liveEntry.lat,
+      lng: liveEntry.lng,
+      city: liveEntry.city,
+      avatarUrl: profile.image,
+    };
+  }
 
   return (
     <>
@@ -44,7 +64,13 @@ export default function ProfilePage({
         editHref={isOwner ? `/dashboard/${profile.id}/edit` : undefined}
       />
       <ContactOverlay view={view} onViewChange={setView} email={profile.email} />
-      <ProjectsOverlay view={view} onViewChange={setView} projects={profile.projects} />
+      <ProjectsOverlay
+        view={view}
+        onViewChange={setView}
+        projects={profile.projects}
+        isOwner={isOwner}
+        profileId={profile.id}
+      />
     </>
   );
 }
