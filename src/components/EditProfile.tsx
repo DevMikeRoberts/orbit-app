@@ -45,6 +45,12 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
     setLocations((ls) => ls.filter((l) => l.id !== id));
   };
 
+  const resetCardOffset = (id: string) => {
+    setLocations((ls) =>
+      ls.map((l) => (l.id === id ? { ...l, cardOffset: undefined } : l)),
+    );
+  };
+
   const addLocation = (city: ResolvedCity) => {
     const id = `loc-${city.lat.toFixed(3)},${city.lng.toFixed(3)}`.replace(
       /[^\w-]/g,
@@ -243,8 +249,18 @@ export function EditProfile({ profile }: { profile: UserProfile }) {
                       : ""}
                     {loc.subEntries.length > 1 &&
                       ` · ${loc.subEntries.length} entries`}
+                    {loc.cardOffset && " · card repositioned"}
                   </span>
                 </div>
+                {loc.cardOffset && (
+                  <button
+                    className="dash-action dash-action--ghost"
+                    onClick={() => resetCardOffset(loc.id)}
+                    title="Move the card back to its default position on the globe"
+                  >
+                    Reset card
+                  </button>
+                )}
                 <button
                   className="dash-action dash-action--danger"
                   onClick={() => removeLocation(loc.id)}

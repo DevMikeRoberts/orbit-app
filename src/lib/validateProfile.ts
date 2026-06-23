@@ -67,6 +67,16 @@ function validateLocation(l: unknown): ProfileLocation | null {
     const v = validateSubEntry(s);
     if (v) subEntries.push(v);
   }
+  let cardOffset: ProfileLocation["cardOffset"] | undefined;
+  if (r.cardOffset && typeof r.cardOffset === "object") {
+    const co = r.cardOffset as Record<string, unknown>;
+    if (isFiniteNumber(co.dLat) && isFiniteNumber(co.dLng)) {
+      const dLat = Math.max(-180, Math.min(180, co.dLat));
+      const dLng = Math.max(-360, Math.min(360, co.dLng));
+      cardOffset = { dLat, dLng };
+    }
+  }
+
   return {
     id: clip(r.id, 128) ?? "",
     city: clip(r.city, 200) ?? "",
@@ -78,6 +88,7 @@ function validateLocation(l: unknown): ProfileLocation | null {
       : undefined,
     subEntries,
     spread: isFiniteNumber(r.spread) ? r.spread : undefined,
+    cardOffset,
   };
 }
 

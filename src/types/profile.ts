@@ -69,6 +69,7 @@ export interface ProfileLocation {
   connectionType?: ConnectionType;
   subEntries: SubEntry[];
   spread?: number;
+  cardOffset?: { dLat: number; dLng: number };
 }
 
 export interface ProfileProject {
