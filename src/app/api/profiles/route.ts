@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { saveProfile, getProfile } from "@/lib/profiles";
 import { generateProfileId } from "@/lib/hash";
+import { sanitizeProfilePatch } from "@/lib/validateProfile";
 import type { UserProfile } from "@/types/profile";
 
 export async function POST(req: NextRequest) {
@@ -10,17 +11,20 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Sign in required" }, { status: 401 });
   }
 
-  let body: Partial<UserProfile>;
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  if (!body.name || typeof body.name !== "string") {
+  const body = sanitizeProfilePatch(raw);
+  const userEmail = session.user.email;
+
+  if (!body.name || !body.name.trim()) {
     return Response.json({ error: "name is required" }, { status: 400 });
   }
-  if (!body.email || typeof body.email !== "string") {
+  if (!userEmail) {
     return Response.json({ error: "email is required" }, { status: 400 });
   }
 
@@ -32,9 +36,10 @@ export async function POST(req: NextRequest) {
   const profile: UserProfile = {
     id,
     name: body.name,
-    handle: body.handle ?? `@${body.name.toLowerCase().replace(/\s+/g, "")}`,
-    email: body.email,
+    handle: body.handle?.trim() || `@${body.name.toLowerCase().replace(/\s+/g, "")}`,
+    email: userEmail,
     title: body.title,
+    image: body.image,
     resumeUrl: body.resumeUrl,
     liveLocation: body.liveLocation,
     locations: body.locations ?? [],

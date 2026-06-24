@@ -9,9 +9,17 @@ const GLOBE_RADIUS = 1;
 export function LivePin({
   lat,
   lng,
+  city,
+  region,
+  country,
+  avatarUrl,
 }: {
   lat: number;
   lng: number;
+  city?: string;
+  region?: string;
+  country?: string;
+  avatarUrl?: string;
 }) {
   const { pos, cardPos } = useMemo(() => {
     const p = latLngToVector3(lat, lng, GLOBE_RADIUS);
@@ -21,6 +29,14 @@ export function LivePin({
       .add(radial.clone().multiplyScalar(GLOBE_RADIUS * 0.06));
     return { pos: p, cardPos: cp };
   }, [lat, lng]);
+
+  const label = city
+    ? [city, region, country].filter(Boolean).join(", ")
+    : "";
+
+  const avatarStyle = avatarUrl
+    ? { backgroundImage: `url(${avatarUrl})` }
+    : { backgroundImage: "url(/placeholder.jpg)" };
 
   return (
     <group>
@@ -38,15 +54,14 @@ export function LivePin({
           <div className="live-avatar-wrapper">
             <div className="live-ping-ring" />
             <div className="live-ping-ring live-ping-ring--delay" />
-            <div
-              className="live-avatar"
-              style={{ backgroundImage: "url(/placeholder.jpg)" }}
-            />
+            <div className="live-avatar" style={avatarStyle} />
           </div>
-          <div className="live-text-bubble">
-            <span className="live-subtitle">currently in</span>
-            <span className="live-city">&nbsp;San Francisco, CA</span>
-          </div>
+          {label && (
+            <div className="live-text-bubble">
+              <span className="live-subtitle">currently in</span>
+              <span className="live-city">&nbsp;{label}</span>
+            </div>
+          )}
         </div>
       </Html>
     </group>

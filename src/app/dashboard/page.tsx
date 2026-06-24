@@ -33,7 +33,7 @@ export default async function DashboardPage() {
       <section className="dash-body">
         <div className="dash-intro">
           <h1 className="dash-title">
-            Your globes<span className="wizard-period">.</span>
+            Your globes<span className="accent-period">.</span>
           </h1>
           <p className="dash-sub">
             Signed in as <strong>{session.user.email}</strong>

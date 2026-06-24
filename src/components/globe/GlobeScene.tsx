@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef } from "react";
+import { Suspense, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
@@ -17,19 +17,40 @@ import { useKonami } from "@/context/KonamiContext";
 import type { View } from "@/components/ProfilePage";
 import type { ProfileLocation } from "@/types/profile";
 
+export type LiveLocationInfo = {
+  lat: number;
+  lng: number;
+  city?: string;
+  region?: string;
+  country?: string;
+  avatarUrl?: string;
+};
+
 function SceneContent({
   view,
   locations,
   liveLocation,
+  isOwner,
+  onDragStart,
+  onDragEnd,
+  onCommitCardOffset,
 }: {
   view: View;
   locations: ProfileLocation[];
-  liveLocation?: { lat: number; lng: number };
+  liveLocation?: LiveLocationInfo;
+  isOwner?: boolean;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  onCommitCardOffset?: (
+    locationId: string,
+    offset: { dLat: number; dLng: number } | null,
+  ) => void;
 }) {
   const globeGroupRef = useRef<THREE.Group>(null);
   const spinProgress = useRef(0);
   const { activated } = useKonami();
   const didLog = useRef(false);
+  const [dragging, setDragging] = useState(false);
 
   useFrame((_, delta) => {
     if (!globeGroupRef.current) return;
@@ -58,11 +79,11 @@ function SceneContent({
       />
 
       <OrbitControls
-        autoRotate={view === "home"}
+        autoRotate={view === "home" && !dragging}
         autoRotateSpeed={0.15}
         enablePan={false}
-        enableZoom={view === "home"}
-        enableRotate={view === "home"}
+        enableZoom={view === "home" && !dragging}
+        enableRotate={view === "home" && !dragging}
         enableDamping
         dampingFactor={0.08}
         rotateSpeed={0.55}
@@ -98,10 +119,28 @@ function SceneContent({
               location={location}
               index={i}
               cardDelay={1.8 + i * 0.15}
+              isOwner={isOwner}
+              globeGroupRef={globeGroupRef}
+              onDragStart={() => {
+                setDragging(true);
+                onDragStart?.();
+              }}
+              onDragEnd={() => {
+                setDragging(false);
+                onDragEnd?.();
+              }}
+              onCommitOffset={onCommitCardOffset}
             />
           ))}
           {liveLocation && (
-            <LivePin lat={liveLocation.lat} lng={liveLocation.lng} />
+            <LivePin
+              lat={liveLocation.lat}
+              lng={liveLocation.lng}
+              city={liveLocation.city}
+              region={liveLocation.region}
+              country={liveLocation.country}
+              avatarUrl={liveLocation.avatarUrl}
+            />
           )}
         </FadeIn>
       </group>
@@ -114,11 +153,22 @@ export function GlobeScene({
   locations,
   liveLocation,
   fill = "viewport",
+  isOwner,
+  onDragStart,
+  onDragEnd,
+  onCommitCardOffset,
 }: {
   view: View;
   locations: ProfileLocation[];
-  liveLocation?: { lat: number; lng: number };
+  liveLocation?: LiveLocationInfo;
   fill?: "viewport" | "container";
+  isOwner?: boolean;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
+  onCommitCardOffset?: (
+    locationId: string,
+    offset: { dLat: number; dLng: number } | null,
+  ) => void;
 }) {
   const wrapperClass =
     fill === "container" ? "absolute inset-0" : "fixed inset-0";
@@ -134,7 +184,15 @@ export function GlobeScene({
           powerPreference: "high-performance",
         }}
       >
-        <SceneContent view={view} locations={locations} liveLocation={liveLocation} />
+        <SceneContent
+          view={view}
+          locations={locations}
+          liveLocation={liveLocation}
+          isOwner={isOwner}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onCommitCardOffset={onCommitCardOffset}
+        />
       </Canvas>
     </div>
   );
