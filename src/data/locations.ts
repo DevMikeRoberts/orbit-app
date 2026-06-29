@@ -4,6 +4,7 @@ export const locations: ProfileLocation[] = [
   {
     id: "san-francisco",
     city: "San Francisco",
+    country: "United States",
     lat: 37.774,
     lng: -122.419,
     color: "#60a5fa",
@@ -31,6 +32,7 @@ export const locations: ProfileLocation[] = [
   {
     id: "new-york",
     city: "New York",
+    country: "United States",
     lat: 40.712,
     lng: -74.006,
     color: "#34d399",
@@ -59,6 +61,7 @@ export const locations: ProfileLocation[] = [
   {
     id: "austin",
     city: "Austin",
+    country: "United States",
     lat: 30.267,
     lng: -97.743,
     color: "#f97316",
@@ -78,6 +81,7 @@ export const locations: ProfileLocation[] = [
   {
     id: "tokyo",
     city: "Tokyo",
+    country: "Japan",
     lat: 35.676,
     lng: 139.65,
     color: "#e879f9",
@@ -97,6 +101,7 @@ export const locations: ProfileLocation[] = [
   {
     id: "projects",
     city: "Remote",
+    country: "Distributed",
     lat: -27.112,
     lng: -109.35,
     color: "#fbbf24",

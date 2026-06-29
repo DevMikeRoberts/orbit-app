@@ -114,7 +114,12 @@ export function PinWithCard({
 
       <Html position={cardPos} center>
         <div className="card" style={{ animationDelay: `${cardDelay}s` }}>
-          <span className="card-city">{location.city}</span>
+          <div className="card-header">
+            <span className="card-city">{location.city}</span>
+            {location.country && (
+              <span className="card-country">{location.country}</span>
+            )}
+          </div>
 
           {companies.map((company: string) => {
             const entries = workEntries.filter((e: SubEntry) => e.company === company);
