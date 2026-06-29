@@ -63,6 +63,7 @@ export interface SubEntry {
 export interface ProfileLocation {
   id: string;
   city: string;
+  country?: string;
   lat: number;
   lng: number;
   color: string;

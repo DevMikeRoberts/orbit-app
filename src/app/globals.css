@@ -51,6 +51,22 @@ body {
   padding-left: 1px;
 }
 
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+  margin-bottom: 0.15em;
+}
+
+.card-country {
+  font-size: 0.6em;
+  font-weight: 700;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
 .card-company-section {
   display: flex;
   flex-direction: column;
