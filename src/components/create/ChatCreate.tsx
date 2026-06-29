@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CityPicker } from "./CityPicker";
+import { UniversityPicker } from "./UniversityPicker";
 import { inferProfile } from "@/lib/inferProfile";
 import type { ChatAnswers, ResolvedCity, ExtraPlace } from "@/lib/inferProfile";
 import { classifyProjectUrl } from "@/lib/projectUrl";
@@ -17,6 +18,7 @@ type StepKind =
   | "text"
   | "year"
   | "city"
+  | "school"
   | "workDetails"
   | "extras"
   | "projects"
@@ -83,8 +85,8 @@ const STEPS: StepDef[] = [
   },
   {
     id: "school",
-    kind: "city",
-    placeholder: "City of your school",
+    kind: "school",
+    placeholder: "Search or enter your school/university",
     bot: () => "Where did you go to school?",
     optional: true,
     skipLabel: "Skip",
@@ -343,11 +345,32 @@ function ActiveInput({
           placeholder={step.placeholder}
           onPick={(city) => {
             const patch: Partial<ChatAnswers> = {};
-            if (step.id === "school") patch.school = { city };
-            else if (step.id === "work")
+            if (step.id === "work")
               patch.work = { ...(answers.work ?? {}), city };
             else (patch as Record<string, ResolvedCity>)[step.id] = city;
             onAdvance(cityLabel(city), patch);
+          }}
+        />
+        {step.optional && (
+          <button className="chat-skip" onClick={onSkip} type="button">
+            {step.skipLabel ?? "Skip"}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (step.kind === "school") {
+    return (
+      <div className="chat-input-row">
+        <UniversityPicker
+          autoFocus
+          placeholder={step.placeholder}
+          onPick={({ university, city }) => {
+            const patch: Partial<ChatAnswers> = {
+              school: { city, name: university },
+            };
+            onAdvance(university, patch);
           }}
         />
         {step.optional && (
@@ -538,6 +561,7 @@ function ExtrasInput({
   onDone: () => void;
 }) {
   const [pendingType, setPendingType] = useState<ConnectionType>("other");
+  const [pendingNote, setPendingNote] = useState("");
 
   return (
     <div className="chat-extras">
@@ -552,6 +576,11 @@ function ExtrasInput({
               <span className="chat-extra-type">
                 {CONNECTION_LABELS[e.type]}
               </span>
+              {e.note && (
+                <span className="chat-extra-note" title={e.note}>
+                  {e.note}
+                </span>
+              )}
               <button
                 type="button"
                 className="chat-extra-remove"
@@ -571,7 +600,10 @@ function ExtrasInput({
             key={t}
             type="button"
             className={`chat-extra-chip ${pendingType === t ? "is-active" : ""}`}
-            onClick={() => setPendingType(t)}
+            onClick={() => {
+              setPendingType(t);
+              setPendingNote("");
+            }}
           >
             <span>{CONNECTION_EMOJIS[t]}</span>
             <span>{CONNECTION_LABELS[t]}</span>
@@ -579,10 +611,21 @@ function ExtrasInput({
         ))}
       </div>
 
+      {pendingType === "other" && (
+        <input
+          type="text"
+          className="chat-input"
+          placeholder="Describe this connection (e.g., 'Volunteer work', 'Summer internship')"
+          value={pendingNote}
+          onChange={(e) => setPendingNote(e.target.value)}
+        />
+      )}
+
       <CityPicker
         placeholder="Add another place…"
         onPick={(city) => {
-          onAdd({ city, type: pendingType });
+          onAdd({ city, type: pendingType, note: pendingType === "other" ? pendingNote : undefined });
+          setPendingNote("");
         }}
       />
 
@@ -724,8 +767,10 @@ function summarize(a: Partial<ChatAnswers>) {
   if (a.raised && a.raised.city !== a.born?.city)
     lines.push({ emoji: "🏡", text: `Grew up in ${a.raised.city}` });
   if (a.live) lines.push({ emoji: "📍", text: `Lives in ${a.live.city}` });
-  if (a.school)
-    lines.push({ emoji: "🎓", text: `Schooled in ${a.school.city.city}` });
+  if (a.school) {
+    const schoolName = a.school.name || "School/University";
+    lines.push({ emoji: "🎓", text: `${schoolName} in ${a.school.city.city}` });
+  }
   if (a.work) {
     const parts = [
       a.work.role,
@@ -738,9 +783,10 @@ function summarize(a: Partial<ChatAnswers>) {
     });
   }
   for (const extra of a.extras ?? []) {
+    const desc = extra.note ? ` — ${extra.note}` : "";
     lines.push({
       emoji: CONNECTION_EMOJIS[extra.type],
-      text: `${CONNECTION_LABELS[extra.type]} — ${extra.city.city}`,
+      text: `${CONNECTION_LABELS[extra.type]} — ${extra.city.city}${desc}`,
     });
   }
   for (const p of a.projects ?? []) {

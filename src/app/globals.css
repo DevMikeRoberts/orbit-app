@@ -1853,3 +1853,19 @@ body {
   border-color: rgba(248,113,113,0.6);
   color: #fecaca;
 }
+
+/* ---------- University Picker ---------- */
+.chat-university {
+  position: relative;
+  width: 100%;
+}
+
+.chat-extra-note {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
