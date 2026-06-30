@@ -68,3 +68,13 @@ export async function listProfileIds(): Promise<string[]> {
   const rows = await sql`SELECT id FROM profiles ORDER BY created_at DESC`;
   return rows.map((r) => r.id as string);
 }
+
+export async function getProfileCount(): Promise<number> {
+  try {
+    const sql = getSql();
+    const rows = await sql`SELECT COUNT(*) as count FROM profiles`;
+    return rows.length > 0 ? (rows[0].count as number) : 0;
+  } catch {
+    return 0;
+  }
+}

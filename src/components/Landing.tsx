@@ -2,6 +2,7 @@
 
 import { GlobeScene } from "@/components/globe/GlobeScene";
 import { AuthNav, type AuthNavUser } from "@/components/AuthNav";
+import { GlobeCounter } from "@/components/GlobeCounter";
 import { locations } from "@/data/locations";
 
 const LIVE_LOCATION = { lat: 37.774, lng: -122.419 };
@@ -45,6 +46,7 @@ export function Landing({ user }: { user: AuthNavUser | null }) {
             <span className="landing-feature-icon">🚀</span>
             <span className="landing-feature-label">Live in minutes</span>
           </div>
+          <GlobeCounter />
         </div>
       </main>
     </>
