@@ -23,6 +23,7 @@ export const locations: ProfileLocation[] = [
         emoji: "🎓",
         role: "B.S. Computer Science",
         place: "State University",
+        prefix: "Studied at",
         description:
           "Graduated 2022. Cloud Certified Solutions Architect.",
         date: "2018 — 2022",

@@ -34,7 +34,7 @@ export interface ChatAnswers {
   born?: ResolvedCity;
   raised?: ResolvedCity;
   live: ResolvedCity;
-  school?: { city: ResolvedCity; name?: string };
+  education?: Array<{ university: string; city: ResolvedCity; degree?: string; major?: string }>;
   work?: { city: ResolvedCity; company?: string; role?: string };
   extras?: ExtraPlace[];
   projects?: import("@/types/profile").ProfileProject[];
@@ -121,13 +121,15 @@ export function inferProfile(
     }),
   });
 
-  if (answers.school) {
+  for (const edu of answers.education ?? []) {
+    const role = [edu.degree, edu.major].filter(Boolean).join(" ") || "School / University";
     pending.push({
       type: "school",
-      city: answers.school.city,
+      city: edu.city,
       entry: entryFor("school", {
-        role: answers.school.name || CONNECTION_LABELS.school,
-        place: placeLabel(answers.school.city),
+        role,
+        place: edu.university,
+        prefix: "Studied at",
       }),
     });
   }
