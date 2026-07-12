@@ -56,6 +56,7 @@ export interface SubEntry {
   company?: string;
   logo?: string;
   place: string;
+  prefix?: string;
   description: string;
   date: string;
 }

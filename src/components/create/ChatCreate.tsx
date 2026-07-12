@@ -14,11 +14,18 @@ import {
 } from "@/types/profile";
 import type { ConnectionType, ProfileProject } from "@/types/profile";
 
+type EducationEntry = {
+  university: string;
+  city: ResolvedCity;
+  degree?: string;
+  major?: string;
+};
+
 type StepKind =
   | "text"
   | "year"
   | "city"
-  | "school"
+  | "education"
   | "workDetails"
   | "extras"
   | "projects"
@@ -84,10 +91,10 @@ const STEPS: StepDef[] = [
     bot: () => "Where do you live now?",
   },
   {
-    id: "school",
-    kind: "school",
+    id: "education",
+    kind: "education",
     placeholder: "Search or enter your school/university",
-    bot: () => "Where did you go to school?",
+    bot: () => "Where did you study?",
     optional: true,
     skipLabel: "Skip",
   },
@@ -360,25 +367,31 @@ function ActiveInput({
     );
   }
 
-  if (step.kind === "school") {
+  if (step.kind === "education") {
     return (
-      <div className="chat-input-row">
-        <UniversityPicker
-          autoFocus
-          placeholder={step.placeholder}
-          onPick={({ university, city }) => {
-            const patch: Partial<ChatAnswers> = {
-              school: { city, name: university },
-            };
-            onAdvance(university, patch);
-          }}
-        />
-        {step.optional && (
-          <button className="chat-skip" onClick={onSkip} type="button">
-            {step.skipLabel ?? "Skip"}
-          </button>
-        )}
-      </div>
+      <EducationInput
+        education={(answers.education as EducationEntry[]) ?? []}
+        onAdd={(entry) =>
+          onPatch({
+            education: [...((answers.education as EducationEntry[]) ?? []), entry],
+          })
+        }
+        onRemove={(i) =>
+          onPatch({
+            education: ((answers.education as EducationEntry[]) ?? []).filter(
+              (_, idx) => idx !== i,
+            ),
+          })
+        }
+        onDone={() => {
+          const count = ((answers.education as EducationEntry[]) ?? []).length;
+          const display =
+            count === 0
+              ? step.skipLabel ?? "No schools"
+              : `${count} school${count === 1 ? "" : "s"} added`;
+          onAdvance(display, {});
+        }}
+      />
     );
   }
 
@@ -761,15 +774,166 @@ function ProjectsInput({
   );
 }
 
+function EducationInput({
+  education,
+  onAdd,
+  onRemove,
+  onDone,
+}: {
+  education: EducationEntry[];
+  onAdd: (entry: EducationEntry) => void;
+  onRemove: (i: number) => void;
+  onDone: () => void;
+}) {
+  const [phase, setPhase] = useState<"university" | "details">("university");
+  const [university, setUniversity] = useState("");
+  const [city, setCity] = useState<ResolvedCity | null>(null);
+  const [degree, setDegree] = useState("");
+  const [major, setMajor] = useState("");
+
+  const reset = () => {
+    setUniversity("");
+    setCity(null);
+    setDegree("");
+    setMajor("");
+    setPhase("university");
+  };
+
+  const commitEntry = () => {
+    if (!city) return;
+    onAdd({
+      university,
+      city,
+      degree: degree.trim() || undefined,
+      major: major.trim() || undefined,
+    });
+    reset();
+  };
+
+  return (
+    <div className="chat-education">
+      {education.length > 0 && (
+        <ul className="chat-extra-list">
+          {education.map((e, i) => (
+            <li
+              key={`${e.university}-${i}`}
+              className="chat-extra-item"
+            >
+              <span className="chat-extra-emoji">🎓</span>
+              <span className="chat-extra-text">
+                {[e.degree, e.major].filter(Boolean).join(" ") || e.university}
+              </span>
+              <span className="chat-extra-type">{e.university}</span>
+              <button
+                type="button"
+                className="chat-extra-remove"
+                onClick={() => onRemove(i)}
+                aria-label="Remove"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {phase === "university" ? (
+        <>
+          <UniversityPicker
+            autoFocus
+            placeholder="Search for a university…"
+            onPick={({ university: name, city: c }) => {
+              setUniversity(name);
+              setCity(c);
+              setPhase("details");
+            }}
+          />
+          <div className="chat-extra-actions">
+            <button
+              type="button"
+              className="chat-send chat-send--ghost"
+              onClick={onDone}
+            >
+              {education.length > 0
+                ? "Done — let's keep going"
+                : "I'm good — let's keep going"}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="chat-education-hint">Studied at {university}</p>
+          <div className="chat-work-details">
+            <div className="chat-work-row">
+              <input
+                autoFocus
+                className="chat-input"
+                placeholder="Degree type (e.g. B.S., M.A., Ph.D.)"
+                value={degree}
+                onChange={(e) => setDegree(e.target.value)}
+              />
+              <input
+                className="chat-input"
+                placeholder="Major / field of study"
+                value={major}
+                onChange={(e) => setMajor(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitEntry();
+                  }
+                }}
+              />
+            </div>
+            <div className="chat-work-actions">
+              <button
+                type="button"
+                className="chat-send chat-send--wide"
+                onClick={commitEntry}
+              >
+                Add this school +
+              </button>
+              <button
+                type="button"
+                className="chat-skip"
+                onClick={() => {
+                  if (city) {
+                    onAdd({
+                      university,
+                      city,
+                      degree: degree.trim() || undefined,
+                      major: major.trim() || undefined,
+                    });
+                  }
+                  reset();
+                }}
+              >
+                Skip details
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function summarize(a: Partial<ChatAnswers>) {
   const lines: { emoji: string; text: string }[] = [];
   if (a.born) lines.push({ emoji: "👶", text: `Born in ${a.born.city}` });
   if (a.raised && a.raised.city !== a.born?.city)
     lines.push({ emoji: "🏡", text: `Grew up in ${a.raised.city}` });
   if (a.live) lines.push({ emoji: "📍", text: `Lives in ${a.live.city}` });
-  if (a.school) {
-    const schoolName = a.school.name || "School/University";
-    lines.push({ emoji: "🎓", text: `${schoolName} in ${a.school.city.city}` });
+  if (a.education && a.education.length > 0) {
+    for (const edu of a.education) {
+      const parts = [edu.degree, edu.major].filter(Boolean).join(" ");
+      lines.push({
+        emoji: "🎓",
+        text: parts
+          ? `${parts} at ${edu.university}`
+          : `Studied at ${edu.university}`,
+      });
+    }
   }
   if (a.work) {
     const parts = [

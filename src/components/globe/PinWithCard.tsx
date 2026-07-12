@@ -151,7 +151,10 @@ export function PinWithCard({
                 <span className="card-emoji">{entry.emoji}</span>
                 <div className="card-body">
                   <p className="card-role">{entry.role}</p>
-                  <span className="card-place">{entry.place}</span>
+                  <span className="card-place">
+                    {entry.prefix && <span className="card-prefix">{entry.prefix} </span>}
+                    {entry.place}
+                  </span>
                   <span className="card-date">{entry.date}</span>
                 </div>
               </div>
